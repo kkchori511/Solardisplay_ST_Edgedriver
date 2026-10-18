@@ -1,5 +1,5 @@
 -- 시하스 V3 드라이버가 보여주던 정보를 표시한다: 전압, 전류, 주파수, 역률, 온도.
--- 그리고 월 누적 생산량: 소비 누적량(CurrentSummationDelivered, 이 기기에서는 태양광 총 발전량)에서
+-- 그리고 월 누적 전력량: 소비 누적량(CurrentSummationDelivered, 이 기기에서는 태양광 총 발전량)에서
 -- 이번 달 시작 시점의 값을 뺀 값. 달(한국 시간)이 바뀌면 시작값을 새로 잡아 0부터 다시 센다.
 -- 배율은 기기에게 직접 물어 확인한 값이다 (2026-10-18 허브 로그):
 --   전압 /10 (ACVoltageDivisor=10), 전류 /100 (ACCurrentDivisor=100), 전력 /1,
@@ -17,14 +17,15 @@ local TM = clusters.TemperatureMeasurement
 
 local v3 = {}
 
-v3.PROFILE = "sihas-solar-monthly"
+v3.PROFILE = "sihas-solar-monthly-v2"
 
 local FREQUENCY_CAPABILITY = "afterguide46998.frequencyMeasurement"
 local POWER_FACTOR_CAPABILITY = "afterguide46998.powerfactorMeasurement"
 
 local POLL_SECONDS = 120
 local TIMER_FIELD = "v3_info_timer"
-local PROFILE_FIELD = "monthly_profile_requested"
+-- 프로필 이름마다 한 번씩만 기기를 옮긴다 (프로필 이름을 바꾸면 자동으로 다시 옮겨진다)
+local PROFILE_FIELD = "profile_requested:" .. v3.PROFILE
 local MONTHLY_COMPONENT = "monthly"
 local MONTHLY_SAVE_SECONDS = 1800 -- 마지막 누적값은 30분마다만 저장한다
 
@@ -76,7 +77,7 @@ function v3.temperature_handler(driver, device, value, zb_rx)
   device:emit_event(capabilities.temperatureMeasurement.temperature({value = round1(value.value / 100), unit = "C"}))
 end
 
--- ---------- 월 누적 생산량 ----------
+-- ---------- 월 누적 전력량 ----------
 
 local KST_OFFSET = 9 * 3600
 

@@ -1,4 +1,4 @@
-name: sihas-solar-monthly
+name: sihas-solar-monthly-v2
 components:
 - id: main
   capabilities:
@@ -25,7 +25,7 @@ components:
   categories:
   - name: CurbPowerMeter
 - id: monthly
-  label: 월 누적 생산량
+  label: 월 누적 전력량
   capabilities:
   - id: energyMeter
     version: 1

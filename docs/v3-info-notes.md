@@ -1,4 +1,4 @@
-# V3 정보 표시와 월 누적 생산량
+# V3 정보 표시와 월 누적 전력량
 
 ## 배경
 태양광 발전기(PMM-300Z2)는 원래 시하스 V3 드라이버의 프로필 `sihas-energy-pmm2-plus-produced`로 표시되던 기기다.
@@ -16,17 +16,17 @@ V3 프로필이 가진 정보: 전력, 누적량, 전압, 전류, 주파수, 역
 | 온도 | TemperatureMeasurement `MeasuredValue` 0x0000 | 나누기 100 | 2423 -> 24.2 C |
 | 소비 누적 | SimpleMetering `CurrentSummationDelivered` 0x0000 | 나누기 1000 | 5706.713 kWh |
 
-- 역방향(생산) 누적 `SimpleMetering 0x0001`은 기기가 지원하지만 이 기기에서는 0이라(CT 방향이 자동이면 모두 양수로 처리) 쓰지 않기로 했다. 대신 아래 월 누적 생산량을 쓴다.
+- 역방향(생산) 누적 `SimpleMetering 0x0001`은 기기가 지원하지만 이 기기에서는 0이라(CT 방향이 자동이면 모두 양수로 처리) 쓰지 않기로 했다. 대신 아래 월 누적 전력량을 쓴다.
 - 기기는 전압, 역률, 온도, 주파수를 스스로 보고한다. 전류와 생산량은 보고가 없어도 2분마다 읽어서 갱신한다.
 
 ## 구현
-- 프로필 `profiles/sihas-solar-monthly.yml`: V3와 같은 기능 구성(`afterguide46998.frequencyMeasurement`, `afterguide46998.powerfactorMeasurement` 커스텀 기능 포함)에 `monthly`(월 누적 생산량) 컴포넌트. 커스텀 기능이 포함된 프로필 업로드가 허용되는 것을 확인했다. 이미 올라간 드라이버의 프로필 이름이 바뀌면 새 이름으로 올리고 기기를 `try_update_metadata`로 옮긴다.
+- 프로필 `profiles/sihas-solar-monthly-v2.yml`: V3와 같은 기능 구성(`afterguide46998.frequencyMeasurement`, `afterguide46998.powerfactorMeasurement` 커스텀 기능 포함)에 `monthly`(월 누적 전력량) 컴포넌트. 커스텀 기능이 포함된 프로필 업로드가 허용되는 것을 확인했다. 이미 올라간 드라이버의 프로필 이름이 바뀌면 새 이름으로 올리고 기기를 `try_update_metadata`로 옮긴다.
 - `fingerprints.yml`: PMM-300Z2만 새 프로필로 연결 (Z1, Z3는 기존 그대로).
 - `src/shinasystems/v3_info.lua`: 값 처리, 배율, 2분 주기 읽기, 이미 등록된 기기를 한 번 새 프로필로 바꾸기(`try_update_metadata`).
 - 안전장치: 프로필에 기능이 없거나 `monthly` 컴포넌트가 없으면 이벤트를 내지 않는다.
 - 로컬 시험(가짜 기기)과 허브 배포 후 기기 상태로 확인했다. 전압 218.2 V, 전류 0.08 A, 주파수 60.1 Hz, 역률 2 %, 온도 24.2 C.
 
-## 월 누적 생산량 (`monthly` 컴포넌트, energyMeter, kWh)
+## 월 누적 전력량 (`monthly` 컴포넌트, energyMeter, kWh)
 - 값 = 소비 누적량(`CurrentSummationDelivered`, 이 기기에서는 태양광 총 발전량) - 이번 달 시작 시점의 누적량. 달은 한국 시간(UTC+9) 기준.
 - 달이 바뀌면 직전에 본 누적값을 새 시작값으로 삼고 0부터 다시 센다. 밤에는 발전이 없어 직전 값이 자정 값과 같다.
 - 처음 켠 달(2026년 10월)은 켠 시점(2026-10-18 13:17, 5706.714 kWh)부터 센다. SmartThings 이력은 약 7일만 보관되어 10월 1일 값을 가져올 수 없었다.
@@ -37,3 +37,8 @@ V3 프로필이 가진 정보: 전력, 누적량, 전압, 전류, 주파수, 역
 
 ## 구현하지 않은 것 (V3 프로필에는 있었음)
 - 설정 3개: 소비 누적 리셋, 생산 누적 리셋, CT 설치 방향. 기기에 쓰는 속성 번호를 알지 못한다. 월 누적은 CT 방향과 무관하게 동작한다.
+
+## 프로필 이름표(라벨)를 바꿀 때 (2026-10-18)
+- 같은 프로필 이름으로 내용(컴포넌트 이름표)만 바꿔 올려도 **이미 등록된 기기에는 반영되지 않는다.** 새 프로필 이름으로 올려야 한다.
+- 그래서 `sihas-solar-monthly`(월 누적 생산량)를 `sihas-solar-monthly-v2`(월 누적 전력량)로 바꿨다. 코드는 프로필 이름마다 기기를 한 번씩 옮긴다 (저장 필드 `profile_requested:<프로필 이름>`). 이름을 바꿔 다시 올리면 자동으로 옮겨진다.
+- 이전 프로필(`sihas-solar-v3`, `sihas-solar-monthly`)은 쓰는 기기가 없다. 드라이버 패키지가 관리하는 프로필이라 CLI 프로필 목록에는 나오지 않아 지우지 못했고, 두어도 영향이 없다.

@@ -80,7 +80,7 @@ local function energy_meter_handler(driver, device, value, zb_rx)
     device:set_field("LAST_SAVE_TICK", curr_save_tick, {persist = false})
   end
   device:emit_event(capabilities.energyMeter.energy({value = raw_value_kilowatts, unit = "kWh"}))
-  -- 월 누적 생산량 (이번 달 시작 시점의 누적값을 뺀 값)
+  -- 월 누적 전력량 (이번 달 시작 시점의 누적값을 뺀 값)
   local ok, err = pcall(v3_info.update_monthly, device, raw_value_kilowatts)
   if not ok then log.warn("월 누적 계산 오류: " .. tostring(err)) end
 end
