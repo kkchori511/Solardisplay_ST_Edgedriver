@@ -18,12 +18,12 @@ local TRACK_COLOR = "#202020"
 
 -- 출력 구간별 색 (W 이하). 마지막은 그 이상 전부.
 local COLOR_STEPS = {
-  {max = 20, color = "#808080"},   -- 흐림/일몰: 회색
-  {max = 1000, color = "#FFD700"}, -- 노랑
-  {max = 2000, color = "#FFA500"}, -- 주황
+  {max = 100, color = "#808080"},   -- 흐림/일몰: 회색
+  {max = 1500, color = "#FFD700"}, -- 노랑
+  {max = 3000, color = "#FFA500"}, -- 주황
 }
-local COLOR_MAX = "#FF0000"        -- 2000W 초과: 빨강
-local RATED_WATTS = 3500           -- 설치 용량. 막대 100%
+local COLOR_MAX = "#FF0000"        -- 3000W 초과: 빨강
+local RATED_WATTS = 3200           -- 막대가 가득 차는 출력. 넘어가면 100%로 고정
 local PUSH_INTERVAL_SECONDS = 15
 
 local TIMER_FIELD = "solar_clock_timer"
