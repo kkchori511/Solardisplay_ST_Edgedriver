@@ -1,5 +1,7 @@
 # Solardisplay_ST_Edgedriver
 
+**현재 버전: v1.0** — 태양광 출력(W)을 시계에 표시하는 기능까지 완성한 안정 버전.
+
 SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값이 갱신될 때 Ulanzi TC001(AWTRIX NG)로 HTTP POST를 보낸다.
 
 - 기반 소스: [SmartThingsEdgeDrivers](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers)의 `drivers/SmartThings/zigbee-power-meter`
@@ -49,3 +51,16 @@ SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값
 - 숫자와 W 사이는 2칸. 4자리(예: 3200W)는 22칸을 써서 1칸 남는다. 5자리는 들어가지 않는다.
 - 간격, 모양, 색은 `src/clock.lua` 맨 위의 `UNIT_GAP`, `UNIT_PIXELS`, `UNIT_COLOR`에서 바꾼다.
 - 시계 화면은 `GET /api/v1/display/screen`(픽셀 RGB 값)으로 읽을 수 있어, 변경 전에 화면으로 검증했다.
+
+## 버전과 브랜치 규칙
+- `main`: 안정 버전만 둔다. 지금 허브에 올라간 드라이버와 같은 코드. 현재 **v1.0** (git 태그 `v1.0`).
+- 새 기능은 `main`에서 브랜치를 따서 작업한다. 예: `weather`(날씨 표시 실험).
+- 브랜치에서 충분히 확인한 뒤에만 `main`에 합치고, 합칠 때 새 버전 태그(`v1.1` 등)를 붙인다.
+- 허브에 배포하는 코드가 어느 브랜치/태그인지 헷갈리지 않게, 배포 전에 `git branch --show-current`로 확인한다.
+- 브랜치 목록: `git branch`, 이동: `git checkout <이름>`, 새로 만들기: `git checkout -b <이름>`.
+
+## v1.0 포함 내용
+- 시하스 PMM-300Z2(태양광 발전기) 전력값을 15초마다 시계(AWTRIX NG)로 전송
+- 출력 구간별 색(회색/노랑/주황/빨강)과 3200W 기준 막대, 번개 아이콘, 초록 W
+- 시계 IP, 색 기준, 용량은 `src/clock.lua` 맨 위 상수
+- 허브 배포: 드라이버 `471c3cca-991d-4a2d-b2d9-797c4e3dd7bb`, 버전 `2026-10-18T12:16:45` (태양광 발전기 1대에 적용)
