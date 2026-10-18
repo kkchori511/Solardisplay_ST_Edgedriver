@@ -37,7 +37,7 @@ zigbeeManufacturer:
     deviceLabel: SiHAS Energy Monitor
     manufacturer: ShinaSystem
     model: "PMM-300Z2"
-    deviceProfileName: sihas-solar-v3
+    deviceProfileName: sihas-solar-monthly
   - id: "ShinaSystem/PMM-300Z3"
     deviceLabel: SiHAS Energy Monitor
     manufacturer: ShinaSystem
