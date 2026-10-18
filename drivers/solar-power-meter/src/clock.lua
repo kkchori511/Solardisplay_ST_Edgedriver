@@ -14,7 +14,16 @@ http.TIMEOUT = 3
 local CLOCK_IP = "192.168.0.12"
 local APP_NAME = "solar"
 local ICON = "bolt"
-local TEXT_COLOR = "#FFD700"
+local TRACK_COLOR = "#202020"
+
+-- 출력 구간별 색 (W 이하). 마지막은 그 이상 전부.
+local COLOR_STEPS = {
+  {max = 20, color = "#808080"},   -- 흐림/일몰: 회색
+  {max = 1000, color = "#FFD700"}, -- 노랑
+  {max = 2000, color = "#FFA500"}, -- 주황
+}
+local COLOR_MAX = "#FF0000"        -- 2000W 초과: 빨강
+local RATED_WATTS = 3500           -- 설치 용량. 막대 100%
 local PUSH_INTERVAL_SECONDS = 15
 
 local TIMER_FIELD = "solar_clock_timer"
@@ -22,10 +31,23 @@ local COUNT_FIELD = "solar_clock_count"
 
 local clock = {}
 
+local function color_for(w)
+  for _, step in ipairs(COLOR_STEPS) do
+    if w <= step.max then return step.color end
+  end
+  return COLOR_MAX
+end
+
 -- 본문 JSON을 만든다. 음수는 0으로 맞추고 정수 W로 표시한다.
+-- 맨 아래 줄 막대는 설치 용량(RATED_WATTS) 대비 비율이다.
 function clock.build_body(watts)
   local w = math.floor(math.max(watts, 0) + 0.5)
-  return string.format('{"text":"%dW","icon":"%s","textColor":"%s"}', w, ICON, TEXT_COLOR)
+  local color = color_for(w)
+  local percent = math.min(100, math.floor(w * 100 / RATED_WATTS + 0.5))
+  return string.format(
+    '{"text":"%dW","icon":"%s","textColor":"%s","progress":%d,"progressColor":"%s","progressTrackColor":"%s"}',
+    w, ICON, color, percent, color, TRACK_COLOR
+  )
 end
 
 local function send(device, watts)
