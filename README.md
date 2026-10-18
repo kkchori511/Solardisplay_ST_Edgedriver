@@ -23,7 +23,7 @@ SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값
 
 ## 배포 기록 (2026-10-18)
 - 채널: `Solardisplay Drivers` (`40607751-7843-4d32-98b8-a1945b4cbc33`, 비공개). 허브: 4층 SmartThings Station (`430d54dc-aa95-4727-b270-a1a42c107ea2`, `192.168.0.118`)이 등록돼 있다.
-- 드라이버 ID: `471c3cca-991d-4a2d-b2d9-797c4e3dd7bb` (`packageKey: solar-power-meter-lan`). 첫 버전 `f4cd103b-fd24-4848-a924-d7273d277164`는 `lan` 권한이 없어 소켓이 `Permission Denied`로 막혔다. 이미 올린 드라이버는 권한을 바꿀 수 없어(`Permissions have been modified`) `packageKey`를 바꿔 새 드라이버로 올렸다. 첫 버전은 허브/채널에 남아 있다.
+- 드라이버 ID: `471c3cca-991d-4a2d-b2d9-797c4e3dd7bb` (`packageKey: solar-power-meter-lan`). 첫 버전 `f4cd103b-fd24-4848-a924-d7273d277164`는 `lan` 권한이 없어 소켓이 `Permission Denied`로 막혔다. 이미 올린 드라이버는 권한을 바꿀 수 없어(`Permissions have been modified`) `packageKey`를 바꿔 새 드라이버로 올렸다. 첫 버전은 삭제했다 (허브 제거, 채널 해제, 드라이버 삭제).
 - 교체한 기기: **태양광 발전기** (`39007be1-bf1e-40b2-9f34-9c9d318a6ce9`)만. 같은 모델(PMM-300Z2)인 "전기차 충전기"와 "전체 전기 모니터"는 기존 시하스 드라이버 그대로 둔다. 이 드라이버로 바꾸면 시계에 값이 섞인다.
 - 교체 전 값: 9W, 5706.581kWh.
 - 이전 드라이버(되돌릴 때): `0c975ca0-7645-4a43-89f2-4c80575cad78` (SiHAS Zigbee Power Meter Consumption V3)
