@@ -1,6 +1,6 @@
 # Solardisplay_ST_Edgedriver
 
-**현재 버전: v1.1** — 태양광 출력(W)을 시계에 표시하고, 전압/전류/주파수/역률/온도와 월 누적 전력량까지 보여주는 안정 버전.
+**현재 버전: v1.1** (이어가기 가이드: [docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md)) — 태양광 출력(W)을 시계에 표시하고, 전압/전류/주파수/역률/온도와 월 누적 전력량까지 보여주는 안정 버전.
 
 SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값이 갱신될 때 Ulanzi TC001(AWTRIX NG)로 HTTP POST를 보낸다.
 
