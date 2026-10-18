@@ -15,6 +15,23 @@ local CLOCK_IP = "192.168.0.12"
 local APP_NAME = "solar"
 local ICON = "bolt"
 local TRACK_COLOR = "#202020"
+local UNIT_COLOR = "#00FF00" -- 단위 W 색 (초록)
+
+-- 글자는 위치를 직접 정해 그린다 (draw 명령은 아이콘을 무시하고 왼쪽 끝 x=0 기준).
+-- 숫자 한 글자는 폭 3 + 간격 1 = 피치 4. 아이콘(8칸) 오른쪽 23칸(x=9~31)을 쓴다.
+local AREA_LEFT = 9
+local AREA_WIDTH = 23
+local DIGIT_PITCH = 4
+local UNIT_WIDTH = 5
+local UNIT_GAP = 2 -- 숫자와 W 사이 빈 칸 (기본 폰트는 1칸)
+-- W 모양: 가운데 기둥을 위로 2칸 더 늘렸다. {열, 행}, 열은 W 왼쪽 끝 기준.
+local UNIT_PIXELS = {
+  {0, 1}, {4, 1},
+  {0, 2}, {2, 2}, {4, 2},
+  {0, 3}, {2, 3}, {4, 3},
+  {0, 4}, {2, 4}, {4, 4},
+  {1, 5}, {3, 5},
+}
 
 -- 출력 구간별 색 (W 이하). 마지막은 그 이상 전부.
 local COLOR_STEPS = {
@@ -39,14 +56,26 @@ local function color_for(w)
 end
 
 -- 본문 JSON을 만든다. 음수는 0으로 맞추고 정수 W로 표시한다.
--- 맨 아래 줄 막대는 설치 용량(RATED_WATTS) 대비 비율이다.
+-- 맨 아래 줄 막대는 RATED_WATTS 대비 비율이다.
 function clock.build_body(watts)
   local w = math.floor(math.max(watts, 0) + 0.5)
   local color = color_for(w)
   local percent = math.min(100, math.floor(w * 100 / RATED_WATTS + 0.5))
+
+  local digits = tostring(w)
+  local total = #digits * DIGIT_PITCH + UNIT_GAP + UNIT_WIDTH - 1
+  local x0 = AREA_LEFT + math.max(0, math.floor((AREA_WIDTH - total) / 2))
+  local xw = x0 + #digits * DIGIT_PITCH - 1 + UNIT_GAP
+
+  local unit = {}
+  for _, p in ipairs(UNIT_PIXELS) do
+    unit[#unit + 1] = string.format("%d,%d", xw + p[1], p[2])
+  end
+
   return string.format(
-    '{"text":"%dW","icon":"%s","textColor":"%s","progress":%d,"progressColor":"%s","progressTrackColor":"%s"}',
-    w, ICON, color, percent, color, TRACK_COLOR
+    '{"text":"","icon":"%s","draw":[["text",%d,1,"%s","%s"],["pixels","%s",%s]],'
+      .. '"progress":%d,"progressColor":"%s","progressTrackColor":"%s"}',
+    ICON, x0, digits, color, UNIT_COLOR, table.concat(unit, ","), percent, color, TRACK_COLOR
   )
 end
 
