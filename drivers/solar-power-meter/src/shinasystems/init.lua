@@ -83,6 +83,7 @@ end
 local do_configure = function(self, device)
   device:refresh()
   device:configure()
+  clock.start(device)
 end
 
 local device_init = function(self, device)
@@ -91,6 +92,11 @@ local device_init = function(self, device)
     device:add_configured_attribute(attribute)
   end
   -- 시계로 전력값 전송 시작 (Solardisplay_ST_TC001)
+  clock.start(device)
+end
+
+-- 기기의 드라이버를 이 드라이버로 교체하면 init이 다시 불리지 않을 수 있어 여기서도 시작한다.
+local device_driver_switched = function(self, device)
   clock.start(device)
 end
 
@@ -110,6 +116,7 @@ local shinasystems_power_meter_handler = {
   lifecycle_handlers = {
     init = configurations.power_reconfig_wrapper(device_init),
     doConfigure = do_configure,
+    driverSwitched = device_driver_switched,
     removed = device_removed,
   },
   can_handle = require("shinasystems.can_handle"),

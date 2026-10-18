@@ -20,3 +20,16 @@ SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값
 - 방식: 순간 전력 핸들러를 건드리지 않고, 15초마다 SmartThings가 계산한 `powerMeter` 값을 읽어 시계에 `PUT /api/v1/apps/pushed/solar`로 보낸다.
 - 시계 IP, 아이콘, 색, 간격은 `src/clock.lua` 맨 위 상수.
 - 아직 허브에서 실제 동작은 확인하지 못했다 (패키징/설치 전).
+
+## 배포 기록 (2026-10-18)
+- 채널: `Solardisplay Drivers` (`40607751-7843-4d32-98b8-a1945b4cbc33`, 비공개). 허브: 4층 SmartThings Station (`430d54dc-aa95-4727-b270-a1a42c107ea2`, `192.168.0.118`)이 등록돼 있다.
+- 드라이버 ID: `f4cd103b-fd24-4848-a924-d7273d277164`
+- 교체한 기기: **태양광 발전기** (`39007be1-bf1e-40b2-9f34-9c9d318a6ce9`)만. 같은 모델(PMM-300Z2)인 "전기차 충전기"와 "전체 전기 모니터"는 기존 시하스 드라이버 그대로 둔다. 이 드라이버로 바꾸면 시계에 값이 섞인다.
+- 교체 전 값: 9W, 5706.581kWh.
+- 이전 드라이버(되돌릴 때): `0c975ca0-7645-4a43-89f2-4c80575cad78` (SiHAS Zigbee Power Meter Consumption V3)
+  ```
+  smartthings edge:drivers:switch 39007be1-bf1e-40b2-9f34-9c9d318a6ce9 --hub 430d54dc-aa95-4727-b270-a1a42c107ea2 --driver 0c975ca0-7645-4a43-89f2-4c80575cad78
+  ```
+- 재배포: `smartthings edge:drivers:package drivers/solar-power-meter --channel 40607751-7843-4d32-98b8-a1945b4cbc33 --hub 430d54dc-aa95-4727-b270-a1a42c107ea2`
+- 첫 버전은 `init`에서만 타이머를 시작해 전송이 안 됐다. 기기 교체 시 `init`이 다시 불리지 않는 것으로 보여 `driverSwitched`, `doConfigure`에서도 시작하도록 고쳤고, 그 뒤 시계 갱신이 확인됐다.
+- 허브 로그는 `smartthings edge:drivers:logcat <driverId> --hub-address 192.168.0.118` (처음 접속할 때 인증서 지문 확인 질문이 나온다).

@@ -49,6 +49,9 @@ local function send(device, watts)
     log.warn(string.format("시계 전송 실패 (%s): %s", CLOCK_IP, tostring(code)))
   elseif success and was_failing then
     log.info("시계 전송 복구")
+  elseif success and device:get_field("solar_clock_first_ok") == nil then
+    log.info(string.format("시계 첫 전송 성공: %s", body))
+    device:set_field("solar_clock_first_ok", true, {persist = false})
   end
   device:set_field(FAILING_FIELD, not success, {persist = false})
 end
@@ -73,6 +76,7 @@ end
 
 function clock.start(device)
   clock.stop(device)
+  log.info(string.format("시계 전송 시작: %s (%d초 간격)", CLOCK_IP, PUSH_INTERVAL_SECONDS))
   local timer = device.thread:call_on_schedule(
     PUSH_INTERVAL_SECONDS,
     function() push_current_power(device) end,
