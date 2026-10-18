@@ -18,7 +18,7 @@ local TEXT_COLOR = "#FFD700"
 local PUSH_INTERVAL_SECONDS = 15
 
 local TIMER_FIELD = "solar_clock_timer"
-local FAILING_FIELD = "solar_clock_failing"
+local COUNT_FIELD = "solar_clock_count"
 
 local clock = {}
 
@@ -43,22 +43,22 @@ local function send(device, watts)
   })
 
   local success = ok ~= nil and code == 200
-  local was_failing = device:get_field(FAILING_FIELD) == true
-  if not success and not was_failing then
-    -- 실패가 이어지는 동안 로그가 쌓이지 않도록 처음 한 번만 남긴다.
-    log.warn(string.format("시계 전송 실패 (%s): %s", CLOCK_IP, tostring(code)))
-  elseif success and was_failing then
-    log.info("시계 전송 복구")
-  elseif success and device:get_field("solar_clock_first_ok") == nil then
-    log.info(string.format("시계 첫 전송 성공: %s", body))
-    device:set_field("solar_clock_first_ok", true, {persist = false})
+  local count = (device:get_field(COUNT_FIELD) or 0) + 1
+  device:set_field(COUNT_FIELD, count, {persist = false})
+  if not success then
+    -- 15초마다 실패 이유를 남긴다 (로그 수집을 늦게 연결해도 보이도록)
+    log.warn(string.format("시계 전송 실패 (%s): ok=%s code=%s", CLOCK_IP, tostring(ok), tostring(code)))
+  elseif count == 1 or count % 40 == 0 then
+    log.info(string.format("시계 전송 성공 #%d: %s", count, body))
   end
-  device:set_field(FAILING_FIELD, not success, {persist = false})
 end
 
 local function push_current_power(device)
   local watts = device:get_latest_state("main", capabilities.powerMeter.ID, capabilities.powerMeter.power.NAME)
-  if type(watts) ~= "number" then return end
+  if type(watts) ~= "number" then
+    log.warn("시계 전송 건너뜀: powerMeter 값 없음 (" .. tostring(watts) .. ")")
+    return
+  end
   local ok, err = pcall(send, device, watts)
   if not ok then
     log.warn("시계 전송 오류: " .. tostring(err))
