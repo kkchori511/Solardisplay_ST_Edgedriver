@@ -64,3 +64,7 @@ SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값
 - 출력 구간별 색(회색/노랑/주황/빨강)과 3200W 기준 막대, 번개 아이콘, 초록 W
 - 시계 IP, 색 기준, 용량은 `src/clock.lua` 맨 위 상수
 - 허브 배포: 드라이버 `471c3cca-991d-4a2d-b2d9-797c4e3dd7bb`, 버전 `2026-10-18T12:16:45` (태양광 발전기 1대에 적용)
+
+## 비밀 정보 보호
+- 인증키 같은 비밀은 레포에 넣지 않는다. `.gitignore`가 `.env*`, `*.local`, `kma_key.lua` 등을 막는다.
+- 커밋 직전 검사: `cp scripts/pre-commit-secrets.sh .git/hooks/pre-commit`로 설치한다. 새로 클론하면 다시 설치해야 한다.
