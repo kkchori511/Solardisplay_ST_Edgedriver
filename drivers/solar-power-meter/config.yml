@@ -1,0 +1,6 @@
+name: 'Solar Power Meter TC001'
+packageKey: 'solar-power-meter'
+permissions:
+  zigbee: {}
+description: "SiHAS PMM-300Z2 전력값을 Ulanzi TC001(AWTRIX NG)로 전송하는 개인용 드라이버 (공식 zigbee-power-meter 포크)"
+vendorSupportInformation: "https://support.smartthings.com"
