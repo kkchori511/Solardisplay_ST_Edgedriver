@@ -1,0 +1,31 @@
+name: sihas-solar-monthly-v2
+components:
+- id: main
+  capabilities:
+  - id: powerMeter
+    version: 1
+  - id: energyMeter
+    version: 1
+  - id: voltageMeasurement
+    version: 1
+  - id: currentMeasurement
+    version: 1
+  - id: afterguide46998.frequencyMeasurement
+    version: 1
+  - id: afterguide46998.powerfactorMeasurement
+    version: 1
+  - id: temperatureMeasurement
+    version: 1
+  - id: powerConsumptionReport
+    version: 1
+  - id: firmwareUpdate
+    version: 1
+  - id: refresh
+    version: 1
+  categories:
+  - name: CurbPowerMeter
+- id: monthly
+  label: 월 누적 전력량
+  capabilities:
+  - id: energyMeter
+    version: 1

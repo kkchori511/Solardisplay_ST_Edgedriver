@@ -9,6 +9,8 @@ local SimpleMetering = clusters.SimpleMetering
 local ElectricalMeasurement = clusters.ElectricalMeasurement
 local configurations = require "configurations"
 local clock = require "clock"
+local log = require "log"
+local v3_info = require "shinasystems.v3_info"
 
 
 local POWERMETER_CONFIGURATION_V2 = {
@@ -78,6 +80,9 @@ local function energy_meter_handler(driver, device, value, zb_rx)
     device:set_field("LAST_SAVE_TICK", curr_save_tick, {persist = false})
   end
   device:emit_event(capabilities.energyMeter.energy({value = raw_value_kilowatts, unit = "kWh"}))
+  -- 월 누적 전력량 (이번 달 시작 시점의 누적값을 뺀 값)
+  local ok, err = pcall(v3_info.update_monthly, device, raw_value_kilowatts)
+  if not ok then log.warn("월 누적 계산 오류: " .. tostring(err)) end
 end
 
 local do_configure = function(self, device)
@@ -93,25 +98,28 @@ local device_init = function(self, device)
   end
   -- 시계로 전력값 전송 시작 (Solardisplay_ST_TC001)
   clock.start(device)
+  v3_info.start(device)
 end
 
 -- 기기의 드라이버를 이 드라이버로 교체하면 init이 다시 불리지 않을 수 있어 여기서도 시작한다.
 local device_driver_switched = function(self, device)
   clock.start(device)
+  v3_info.start(device)
 end
 
 local device_removed = function(self, device)
   clock.stop(device)
+  v3_info.stop(device)
 end
+
+-- V3 정보(전압, 전류, 주파수, 역률, 온도, 생산량) 핸들러에 기존 누적(소비) 핸들러를 더한다
+local attr_handlers = v3_info.attr_handlers()
+attr_handlers[SimpleMetering.ID][SimpleMetering.attributes.CurrentSummationDelivered.ID] = energy_meter_handler
 
 local shinasystems_power_meter_handler = {
   NAME = "shinasystems power meter handler",
   zigbee_handlers = {
-    attr = {
-      [SimpleMetering.ID] = {
-        [SimpleMetering.attributes.CurrentSummationDelivered.ID] = energy_meter_handler
-      }
-    }
+    attr = attr_handlers
   },
   lifecycle_handlers = {
     init = configurations.power_reconfig_wrapper(device_init),

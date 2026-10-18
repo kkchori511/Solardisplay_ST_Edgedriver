@@ -68,3 +68,7 @@ SmartThings 엣지 드라이버 쪽 작업 레포. 시하스 PMM-300Z2 전력값
 ## 비밀 정보 보호
 - 인증키 같은 비밀은 레포에 넣지 않는다. `.gitignore`가 `.env*`, `*.local`, `kma_key.lua` 등을 막는다.
 - 커밋 직전 검사: `cp scripts/pre-commit-secrets.sh .git/hooks/pre-commit`로 설치한다. 새로 클론하면 다시 설치해야 한다.
+
+## V3 정보 표시 (v3-info 브랜치)
+- 태양광 발전기에 전압, 전류, 주파수, 역률, 온도와 월 누적 전력량(매월 1일 0부터 다시 측정)을 추가했다. 자세한 내용과 기기에서 확인한 배율: [docs/v3-info-notes.md](docs/v3-info-notes.md)
+- 새 프로필: `drivers/solar-power-meter/profiles/sihas-solar-monthly-v2.yml`
